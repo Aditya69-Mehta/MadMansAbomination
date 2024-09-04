@@ -4,41 +4,66 @@ using System.Collections.Generic;
 using Cinemachine;
 using StarterAssets;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 public class Weapon : MonoBehaviour
 {
+
+    [Header("Referenced GameObjects")]
     [SerializeField] Camera FPCamera;
     [SerializeField] CinemachineVirtualCamera virtualCam;
-
-    [SerializeField] int zoomFOV = 40;
-    [SerializeField] float rayRange = 100f;
-    [SerializeField] int damage = 2;
-
     [SerializeField] ParticleSystem muzzleFlashVFX;
     [SerializeField] GameObject hitEffectVFX;
+
+    [Header("Weapon Settings")]
+    [SerializeField] int zoomFOV = 40;
+    [SerializeField] float weaponRange = 100f;
+    [SerializeField] int damage = 2;
+    [SerializeField] float shootCooldown = .5f;
+    [SerializeField] AmmoType ammoType;
+
 
     float defaultFOV = 60f;
     float defaultMouseSensitivity = 15f;
     float zoomedMouseSensitivity = 10f;
+    bool canShoot = true;
 
     FirstPersonController firstPersonController;
+    Ammo ammoSlot;
+
+
+    void OnEnable(){
+        canShoot = true;
+    }
+
+    void OnDisable() {
+        virtualCam.m_Lens.FieldOfView = defaultFOV;
+        firstPersonController.RotationSpeed = defaultMouseSensitivity;
+    }
 
     void Start(){
         firstPersonController = GetComponentInParent<FirstPersonController>();
+        ammoSlot = GetComponentInParent<Ammo>();
     }
 
 
     void Update(){
-        if(Input.GetButtonDown("Fire1")){
-            Shoot();
+        if(Input.GetButtonDown("Fire1") && canShoot){
+            StartCoroutine(Shoot());
         }
         WeaponZoom();
     }
 
-    void Shoot()
+    IEnumerator Shoot()
     {
-        PlayMuzzleFlash();
-        ProcessRaycast();
+        canShoot = false;
+        if(ammoSlot.GetCurrentAmmo(ammoType) > 0){
+            PlayMuzzleFlash();
+            ProcessRaycast();
+            ammoSlot.DecreseAmmo(ammoType);
+        }
+        yield return new WaitForSeconds(shootCooldown);
+        canShoot = true;
     }
 
     void PlayMuzzleFlash(){
@@ -48,7 +73,7 @@ public class Weapon : MonoBehaviour
     void ProcessRaycast(){
         RaycastHit hit;
 
-        if (Physics.Raycast(FPCamera.transform.position, FPCamera.transform.forward, out hit, rayRange))
+        if (Physics.Raycast(FPCamera.transform.position, FPCamera.transform.forward, out hit, weaponRange))
         {
             Debug.Log(hit.transform.name);
 

@@ -14,6 +14,7 @@ public class DeathHandler : MonoBehaviour
 
     public void DeathHandle(){
         Time.timeScale = 0;
+        GetComponentInChildren<WeaponSwitcher>().enabled = false;
         gameOverCanvas.enabled = true;
         sessionHandler.ProcessPause();
         // Cursor.lockState = CursorLockMode.None;

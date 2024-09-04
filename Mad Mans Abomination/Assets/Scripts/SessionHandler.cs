@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class SessionHandler : MonoBehaviour
 {
     StarterAssets.StarterAssetsInputs starterAssetsInputs;
-    bool gamePaused = false;
+    // bool gamePaused = false;
 
 
     void Start(){
@@ -18,7 +18,7 @@ public class SessionHandler : MonoBehaviour
     }
 
     void UnPause(){
-        gamePaused = false;
+        // gamePaused = false;
 
         starterAssetsInputs.cursorLocked = true;
         starterAssetsInputs.cursorInputForLook = true;
@@ -26,7 +26,7 @@ public class SessionHandler : MonoBehaviour
     }
 
     public void ProcessPause(){
-        gamePaused = true;
+        // gamePaused = true;
 
         starterAssetsInputs.cursorLocked = false;
         starterAssetsInputs.cursorInputForLook = false;
